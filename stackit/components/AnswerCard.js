@@ -6,17 +6,22 @@ import { Check } from "lucide-react";
 import VoteButtons from "@/components/VoteButtons";
 import { ButtonLoadingSpinner } from "@/components/LoadingSpinner";
 
-export default function AnswerCard({ answer, questionAuthorId, userId, questionId }) {
+export default function AnswerCard({
+  answer,
+  questionAuthorId,
+  userId,
+  questionId,
+}) {
   const [isAccepted, setIsAccepted] = useState(answer.isAccepted);
   const [isLoading, setIsLoading] = useState(false);
-  
-  const upvotes = answer.votes.filter(vote => vote.type === 'UP').length;
-  const downvotes = answer.votes.filter(vote => vote.type === 'DOWN').length;
+
+  const upvotes = answer.votes.filter((vote) => vote.type === "UP").length;
+  const downvotes = answer.votes.filter((vote) => vote.type === "DOWN").length;
   const score = upvotes - downvotes;
-  
+
   // Get user's vote on this answer
-  const userVote = userId 
-    ? answer.votes.find(vote => vote.userId === userId)?.type || null
+  const userVote = userId
+    ? answer.votes.find((vote) => vote.userId === userId)?.type || null
     : null;
 
   // Check if current user is the question author
@@ -27,14 +32,14 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/answers/accept', {
-        method: 'POST',
+      const response = await fetch("/api/answers/accept", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           answerId: answer.id,
-          questionId: questionId
+          questionId: questionId,
         }),
       });
 
@@ -46,38 +51,44 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
         // For now, we'll just update the local state
         // Other answers will be updated when the page is naturally refreshed
       } else {
-        console.error('Error accepting answer:', data.error);
+        console.error("Error accepting answer:", data.error);
       }
     } catch (error) {
-      console.error('Error accepting answer:', error);
+      console.error("Error accepting answer:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={`bg-white border rounded-lg p-6 ${isAccepted ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}>
+    <div
+      className={`bg-white border rounded-lg p-6 ${
+        isAccepted ? "border-green-200 bg-green-50" : "border-gray-200"
+      }`}
+    >
       <div className="flex gap-6">
         {/* Vote Section */}
         <div className="flex flex-col items-center space-y-2">
-          <VoteButtons 
+          <VoteButtons
             initialScore={score}
             initialUserVote={userVote}
             answerId={answer.id}
             size="default"
           />
-          
+
           {/* Accept Answer Button (only for question author) */}
           {isQuestionAuthor && (
             <button
               onClick={handleAcceptAnswer}
               disabled={isLoading}
               className={`p-2 rounded-full transition-colors flex items-center justify-center ${
-                isAccepted 
-                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
-                  : 'bg-gray-100 text-gray-400 hover:bg-green-100 hover:text-green-600'
-              } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              title={isAccepted ? 'Unaccept this answer' : 'Accept this answer'}
+                isAccepted
+                  ? "bg-green-100 text-green-600 hover:bg-green-200"
+                  : "bg-gray-100 text-gray-400 hover:bg-green-100 hover:text-green-600"
+              } ${
+                isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+              }`}
+              title={isAccepted ? "Unaccept this answer" : "Accept this answer"}
             >
               {isLoading ? (
                 <ButtonLoadingSpinner />
@@ -86,7 +97,7 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
               )}
             </button>
           )}
-          
+
           {/* Accepted indicator (for everyone) */}
           {isAccepted && !isQuestionAuthor && (
             <div className="p-2 rounded-full bg-green-100 text-green-600">
@@ -97,8 +108,8 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
 
         {/* Content */}
         <div className="flex-1">
-          <div 
-            className="prose max-w-none mb-6"
+          <div
+            className="prose prose-black max-w-none mb-6"
             dangerouslySetInnerHTML={{ __html: answer.content }}
           />
 
@@ -110,17 +121,21 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
                 Accepted Answer
               </div>
             )}
-            
+
             <div className="bg-gray-50 rounded-lg p-3 text-sm ml-auto">
               <div className="text-gray-600 mb-1">
                 answered {formatRelativeTime(answer.createdAt)}
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                  {answer.author.name?.[0] || answer.author.username?.[0] || answer.author.email?.[0]}
+                  {answer.author.name?.[0] ||
+                    answer.author.username?.[0] ||
+                    answer.author.email?.[0]}
                 </div>
                 <span className="font-medium text-gray-900">
-                  {answer.author.name || answer.author.username || answer.author.email}
+                  {answer.author.name ||
+                    answer.author.username ||
+                    answer.author.email}
                 </span>
               </div>
             </div>
