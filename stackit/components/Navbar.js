@@ -20,9 +20,11 @@ export default function Navbar() {
               <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
                 <span className="text-white font-bold text-sm">S</span>
               </div>
-              <span className="text-xl font-bold text-gray-900 hidden sm:block">StackIt</span>
+              <span className="text-xl font-bold text-gray-900 hidden sm:block">
+                StackIt
+              </span>
             </Link>
-            
+
             {/* Main Navigation */}
             <div className="hidden md:flex space-x-1">
               <Link
@@ -65,7 +67,7 @@ export default function Navbar() {
             ) : session ? (
               <div className="flex items-center space-x-3">
                 <NotificationBell />
-                
+
                 {/* User Avatar & Menu */}
                 <div className="relative">
                   <div className="flex items-center space-x-2 cursor-pointer">
@@ -77,7 +79,7 @@ export default function Navbar() {
                     </span>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => signOut()}
                   className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"
@@ -103,21 +105,17 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Ask Question Button */}
-            <Link
-              href="/ask"
-              className="px-3 py-1.5 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded font-medium hidden md:block"
-            >
-              Ask Question
-            </Link>
-
             {/* Mobile menu button */}
             <div className="md:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="p-2 text-gray-600 hover:text-gray-900"
               >
-                {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {isMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
@@ -138,7 +136,7 @@ export default function Navbar() {
                   />
                 </div>
               </div>
-              
+
               <Link
                 href="/"
                 className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
@@ -157,13 +155,7 @@ export default function Navbar() {
               >
                 Users
               </Link>
-              <Link
-                href="/ask"
-                className="block px-3 py-2 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded font-medium mx-2"
-              >
-                Ask Question
-              </Link>
-              
+
               {!session && (
                 <div className="px-2 pt-2 space-y-2">
                   <Link
