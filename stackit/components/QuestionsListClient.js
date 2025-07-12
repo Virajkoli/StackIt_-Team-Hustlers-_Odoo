@@ -1,53 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import QuestionCard from "@/components/QuestionCard";
 import Link from "next/link";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function QuestionsListClient({ initialQuestions }) {
   const [questions, setQuestions] = useState(initialQuestions);
   const [activeFilter, setActiveFilter] = useState("newest");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Memoize filtered questions for better performance
+  const filteredQuestions = useMemo(() => {
+    let sortedQuestions = [...initialQuestions];
+    
+    switch (activeFilter) {
+      case "newest":
+        return sortedQuestions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      case "active":
+        // Sort by most recent activity (answers, votes)
+        return sortedQuestions.sort((a, b) => {
+          const aLastActivity = Math.max(
+            new Date(a.createdAt).getTime(),
+            ...a.answers.map(answer => new Date(answer.createdAt || a.createdAt).getTime())
+          );
+          const bLastActivity = Math.max(
+            new Date(b.createdAt).getTime(),
+            ...b.answers.map(answer => new Date(answer.createdAt || b.createdAt).getTime())
+          );
+          return bLastActivity - aLastActivity;
+        });
+      case "unanswered":
+        return sortedQuestions.filter(q => q._count.answers === 0);
+      default:
+        return sortedQuestions;
+    }
+  }, [initialQuestions, activeFilter]);
+
   const filterQuestions = async (filter) => {
     setIsLoading(true);
     setActiveFilter(filter);
     
-    try {
-      let sortedQuestions = [...initialQuestions];
-      
-      switch (filter) {
-        case "newest":
-          sortedQuestions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-          break;
-        case "active":
-          // Sort by most recent activity (answers, votes)
-          sortedQuestions.sort((a, b) => {
-            const aLastActivity = Math.max(
-              new Date(a.createdAt).getTime(),
-              ...a.answers.map(answer => new Date(answer.createdAt || a.createdAt).getTime())
-            );
-            const bLastActivity = Math.max(
-              new Date(b.createdAt).getTime(),
-              ...b.answers.map(answer => new Date(answer.createdAt || b.createdAt).getTime())
-            );
-            return bLastActivity - aLastActivity;
-          });
-          break;
-        case "unanswered":
-          sortedQuestions = sortedQuestions.filter(q => q._count.answers === 0);
-          break;
-        default:
-          break;
-      }
-      
-      setQuestions(sortedQuestions);
-    } catch (error) {
-      console.error("Error filtering questions:", error);
-    } finally {
+    // Simulate a small delay for UX (removing this makes it too fast and jarring)
+    setTimeout(() => {
+      setQuestions(filteredQuestions);
       setIsLoading(false);
-    }
+    }, 100);
   };
+
+  // Update questions when filtered questions change
+  useEffect(() => {
+    setQuestions(filteredQuestions);
+  }, [filteredQuestions]);
 
   const getButtonStyles = (filter) => {
     const isActive = activeFilter === filter;
@@ -155,14 +159,21 @@ export default function QuestionsListClient({ initialQuestions }) {
           )}
         </div>
       ) : (
-        <div className="space-y-0">
-          {questions.map((question, index) => (
-            <QuestionCard 
-              key={question.id} 
-              question={question} 
-              isLast={index === questions.length - 1}
-            />
-          ))}
+        <div className="relative">
+          {isLoading && (
+            <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+              <LoadingSpinner text="Filtering questions..." />
+            </div>
+          )}
+          <div className={`space-y-0 ${isLoading ? 'opacity-50' : ''}`}>
+            {questions.map((question, index) => (
+              <QuestionCard 
+                key={question.id} 
+                question={question} 
+                isLast={index === questions.length - 1}
+              />
+            ))}
+          </div>
         </div>
       )}
 

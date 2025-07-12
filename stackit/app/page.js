@@ -3,18 +3,33 @@ import { prisma } from "@/lib/prisma";
 import { formatRelativeTime } from "@/lib/utils";
 import QuestionsListClient from "@/components/QuestionsListClient";
 
+// Add caching for 60 seconds
+export const revalidate = 60;
+
 async function getQuestions() {
   try {
     const questions = await prisma.question.findMany({
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        createdAt: true,
+        views: true,
+        authorId: true,
         author: {
           select: {
+            id: true,
             name: true,
             username: true,
             email: true,
           },
         },
-        tags: true,
+        tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         answers: {
           select: {
             id: true,

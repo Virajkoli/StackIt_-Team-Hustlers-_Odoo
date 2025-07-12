@@ -10,11 +10,20 @@ import { authOptions } from "@/lib/auth";
 import AnswerForm from "@/components/AnswerForm";
 import ViewTracker from "@/components/ViewTracker";
 
+// Add caching for question pages
+export const revalidate = 30;
+
 async function getQuestion(id, userId = null) {
   try {
     const question = await prisma.question.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        createdAt: true,
+        views: true,
+        authorId: true,
         author: {
           select: {
             id: true,
@@ -23,9 +32,19 @@ async function getQuestion(id, userId = null) {
             email: true,
           },
         },
-        tags: true,
+        tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         answers: {
-          include: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            isAccepted: true,
+            authorId: true,
             author: {
               select: {
                 id: true,

@@ -18,6 +18,29 @@ export function useVoting(initialScore, initialUserVote, questionId, answerId) {
 
     if (isLoading) return;
 
+    // Optimistic UI update
+    const currentUserVote = userVote;
+    const currentScore = score;
+    
+    // Calculate optimistic values
+    let optimisticScore = currentScore;
+    let optimisticUserVote = type;
+
+    if (currentUserVote === type) {
+      // Removing vote
+      optimisticScore = currentUserVote === 'UP' ? currentScore - 1 : currentScore + 1;
+      optimisticUserVote = null;
+    } else if (currentUserVote) {
+      // Changing vote
+      optimisticScore = currentUserVote === 'UP' ? currentScore - 2 : currentScore + 2;
+    } else {
+      // Adding new vote
+      optimisticScore = type === 'UP' ? currentScore + 1 : currentScore - 1;
+    }
+
+    // Apply optimistic update
+    setScore(optimisticScore);
+    setUserVote(optimisticUserVote);
     setIsLoading(true);
 
     try {
@@ -35,18 +58,24 @@ export function useVoting(initialScore, initialUserVote, questionId, answerId) {
       const data = await response.json();
 
       if (response.ok) {
+        // Update with actual server response
         setScore(data.score);
         setUserVote(data.userVote);
       } else {
         console.error('Vote error:', data.error);
-        // You might want to show a toast notification here
+        // Revert optimistic update on error
+        setScore(currentScore);
+        setUserVote(currentUserVote);
       }
     } catch (error) {
       console.error('Vote request failed:', error);
+      // Revert optimistic update on error
+      setScore(currentScore);
+      setUserVote(currentUserVote);
     } finally {
       setIsLoading(false);
     }
-  }, [session, isLoading, questionId, answerId]);
+  }, [session, isLoading, questionId, answerId, userVote, score]);
 
   const upvote = useCallback(() => vote('UP'), [vote]);
   const downvote = useCallback(() => vote('DOWN'), [vote]);

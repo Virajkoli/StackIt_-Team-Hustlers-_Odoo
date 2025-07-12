@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FastLink from "@/components/FastLink";
 import { formatRelativeTime } from "@/lib/utils";
 import { ArrowUp, ArrowDown, MessageCircle, Check } from "lucide-react";
 
@@ -37,11 +38,11 @@ export default function QuestionCard({ question, isLast }) {
         {/* Question Content */}
         <div className="flex-1">
           <div className="mb-2">
-            <Link href={`/question/${question.id}`}>
+            <FastLink href={`/question/${question.id}`}>
               <h3 className="text-lg font-medium text-blue-600 hover:text-blue-800 cursor-pointer mb-2">
                 {question.title}
               </h3>
-            </Link>
+            </FastLink>
             <p className="text-gray-700 text-sm line-clamp-2 mb-3">
               {question.description.replace(/<[^>]*>/g, '').substring(0, 200)}
               {question.description.length > 200 && '...'}

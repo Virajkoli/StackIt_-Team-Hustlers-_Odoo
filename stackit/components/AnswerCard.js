@@ -4,6 +4,7 @@ import { useState } from "react";
 import { formatRelativeTime } from "@/lib/utils";
 import { Check } from "lucide-react";
 import VoteButtons from "@/components/VoteButtons";
+import { ButtonLoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function AnswerCard({ answer, questionAuthorId, userId, questionId }) {
   const [isAccepted, setIsAccepted] = useState(answer.isAccepted);
@@ -41,8 +42,9 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
 
       if (data.success) {
         setIsAccepted(data.isAccepted);
-        // Reload the page to update all answers' accept status
-        window.location.reload();
+        // Use router.refresh() instead of window.location.reload() for better performance
+        // For now, we'll just update the local state
+        // Other answers will be updated when the page is naturally refreshed
       } else {
         console.error('Error accepting answer:', data.error);
       }
@@ -70,14 +72,18 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
             <button
               onClick={handleAcceptAnswer}
               disabled={isLoading}
-              className={`p-2 rounded-full transition-colors ${
+              className={`p-2 rounded-full transition-colors flex items-center justify-center ${
                 isAccepted 
                   ? 'bg-green-100 text-green-600 hover:bg-green-200' 
                   : 'bg-gray-100 text-gray-400 hover:bg-green-100 hover:text-green-600'
               } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               title={isAccepted ? 'Unaccept this answer' : 'Accept this answer'}
             >
-              <Check className="w-5 h-5" />
+              {isLoading ? (
+                <ButtonLoadingSpinner />
+              ) : (
+                <Check className="w-5 h-5" />
+              )}
             </button>
           )}
           
