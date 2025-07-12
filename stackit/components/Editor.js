@@ -25,6 +25,7 @@ export default function Editor({ content, onChange, placeholder }) {
   const [linkUrl, setLinkUrl] = useState("");
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Image.configure({

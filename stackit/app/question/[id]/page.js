@@ -4,6 +4,9 @@ import { formatRelativeTime } from "@/lib/utils";
 import { ArrowUp, ArrowDown, Check, MessageCircle } from "lucide-react";
 import AnswerCard from "@/components/AnswerCard";
 import Link from "next/link";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import AnswerForm from "@/components/AnswerForm";
 
 async function getQuestion(id) {
   try {
@@ -71,6 +74,7 @@ async function getQuestion(id) {
 export default async function QuestionPage({ params }) {
   const { id } = await params;
   const question = await getQuestion(id);
+  const session = await getServerSession(authOptions);
 
   if (!question) {
     notFound();
@@ -82,7 +86,8 @@ export default async function QuestionPage({ params }) {
   const hasAcceptedAnswer = question.answers.some(answer => answer.isAccepted);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Question Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
@@ -196,16 +201,23 @@ export default async function QuestionPage({ params }) {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Your Answer
         </h3>
-        <p className="text-gray-600 mb-4">
-          Please sign in to post an answer.
-        </p>
-        <Link
-          href="/login"
-          className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-3 rounded-lg font-medium inline-block"
-        >
-          Sign In to Answer
-        </Link>
+        {session ? (
+          <AnswerForm questionId={question.id} />
+        ) : (
+          <>
+            <p className="text-gray-600 mb-4">
+              Please sign in to post an answer.
+            </p>
+            <Link
+              href="/login"
+              className="bg-orange-500 text-white hover:bg-orange-600 px-4 py-2 rounded font-medium text-sm"
+            >
+              Sign In to Answer
+            </Link>
+          </>
+        )}
       </div>
+    </div>
     </div>
   );
 }
