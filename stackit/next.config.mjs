@@ -1,27 +1,31 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["lucide-react"],
+  // Enable static optimization
+  swcMinify: true,
+  
+  // Optimize images
+  images: {
+    domains: ['res.cloudinary.com'],
+    formats: ['image/webp', 'image/avif'],
+  },
+
+  // Optimize for performance
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+
+  // Enable experimental features for better performance
   experimental: {
-    optimizePackageImports: ["lucide-react"],
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react'],
     // Improve build performance
     webpackBuildWorker: true,
-    // Enable faster compilation
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
-      },
-    },
   },
-  // Optimize for development
-  swcMinify: true,
-  // Reduce bundle size
-  compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
-  },
-  // Improve performance
+
+  // Compression
+  compress: true,
+
+  // Optimize for development and production
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
       // Reduce compilation in development
@@ -37,6 +41,18 @@ const nextConfig = {
       };
     }
     return config;
+  },
+
+  // Headers for better caching
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=10, stale-while-revalidate=59' }
+        ],
+      },
+    ]
   },
 };
 
