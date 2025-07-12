@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Bell, User, LogOut, Menu, X, Search } from "lucide-react";
+import { Bell, User, LogOut, Menu, X, Search, Settings, ChevronDown } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import NotificationBell from "./NotificationBell";
 import SearchBar from "./SearchBar";
@@ -10,6 +10,7 @@ import SearchBar from "./SearchBar";
 export default function Navbar() {
   const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
   return (
     <nav className="bg-white border-b border-gray-300 sticky top-0 z-50 shadow-sm">
@@ -61,26 +62,79 @@ export default function Navbar() {
             ) : session ? (
               <div className="flex items-center space-x-3">
                 <NotificationBell />
-
-                {/* User Avatar & Menu */}
+                
+                {/* User Profile Dropdown */}
                 <div className="relative">
-                  <div className="flex items-center space-x-2 cursor-pointer">
-                    <div className="w-7 h-7 bg-blue-600 rounded-sm flex items-center justify-center text-white text-xs font-medium">
-                      {session.user.name?.[0] || session.user.email?.[0] || "U"}
+                  <button
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    className="flex items-center space-x-2 p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
+                      {session.user.image ? (
+                        <img
+                          src={session.user.image}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-white text-sm font-medium">
+                          {session.user.name?.[0] || session.user.email?.[0] || "U"}
+                        </span>
+                      )}
                     </div>
-                    <span className="hidden md:block text-sm text-gray-700 font-medium">
-                      {session.user.name || session.user.email}
+                    <span className="hidden md:block text-sm text-gray-700 font-medium max-w-24 truncate">
+                      {session.user.name || session.user.username || session.user.email}
                     </span>
-                  </div>
-                </div>
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  </button>
 
-                <button
-                  onClick={() => signOut()}
-                  className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"
-                  title="Sign out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
+                  {/* Dropdown Menu */}
+                  {isProfileDropdownOpen && (
+                    <>
+                      {/* Backdrop */}
+                      <div 
+                        className="fixed inset-0 z-10" 
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      ></div>
+                      
+                      {/* Dropdown Content */}
+                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+                        <div className="py-1">
+                          {/* User Info */}
+                          <div className="px-4 py-2 border-b border-gray-100">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {session.user.name || session.user.username}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {session.user.email}
+                            </p>
+                          </div>
+                          
+                          {/* Menu Items */}
+                          <Link
+                            href="/profile"
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            <Settings className="w-4 h-4 mr-3" />
+                            Profile Settings
+                          </Link>
+                          
+                          <button
+                            onClick={() => {
+                              setIsProfileDropdownOpen(false);
+                              signOut();
+                            }}
+                            className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+                          >
+                            <LogOut className="w-4 h-4 mr-3" />
+                            Sign out
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
