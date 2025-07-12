@@ -9,6 +9,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import AnswerForm from "@/components/AnswerForm";
 import ViewTracker from "@/components/ViewTracker";
+import AdminActions from "@/components/AdminActions";
 
 // Add caching for question pages
 export const revalidate = 30;
@@ -149,12 +150,12 @@ export default async function QuestionPage({ params }) {
               size="large"
             />
 
-            {/* Content */}
-            <div className="flex-1 ">
-              <div
-                className="prose prose-black max-w-none mb-6"
-                dangerouslySetInnerHTML={{ __html: question.description }}
-              />
+          {/* Content */}
+          <div className="flex-1">
+            <div 
+              className="prose max-w-none mb-6"
+              dangerouslySetInnerHTML={{ __html: question.description }}
+            />
 
               {/* Tags */}
               {question.tags.length > 0 && (
@@ -190,6 +191,12 @@ export default async function QuestionPage({ params }) {
                   </div>
                 </div>
               </div>
+              
+              {/* Admin Actions */}
+              <AdminActions 
+                contentType="question" 
+                contentId={question.id}
+              />
             </div>
           </div>
         </div>

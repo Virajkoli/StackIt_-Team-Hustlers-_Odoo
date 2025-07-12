@@ -2,15 +2,72 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Bell, User, LogOut, Menu, X, Search, Settings, ChevronDown, Shield } from "lucide-react";
+import { Bell, User, LogOut, Menu, X, Search, Settings, ChevronDown, Shield, Camera } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import NotificationBell from "./NotificationBell";
 import SearchBar from "./SearchBar";
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert("Please select a valid image file");
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size should be less than 5MB");
+      return;
+    }
+
+    setImageUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload/profile', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload image');
+      }
+
+      const data = await response.json();
+      
+      // Update session with new image
+      await update({
+        ...session,
+        user: {
+          ...session.user,
+          image: data.imageUrl
+        }
+      });
+
+      alert("Profile picture updated successfully!");
+
+    } catch (error) {
+      console.error('Image upload error:', error);
+      alert("Failed to upload image: " + error.message);
+    } finally {
+      setImageUploading(false);
+      // Clear the file input
+      e.target.value = '';
+      setIsProfileDropdownOpen(false);
+    }
+  };
 
   return (
     <nav className="bg-white border-b border-gray-300 sticky top-0 z-50 shadow-sm">
@@ -69,7 +126,7 @@ export default function Navbar() {
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                     className="flex items-center space-x-2 p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
                       {session.user.image ? (
                         <img
                           src={session.user.image}
@@ -80,6 +137,22 @@ export default function Navbar() {
                         <span className="text-white text-sm font-medium">
                           {session.user.name?.[0] || session.user.email?.[0] || "U"}
                         </span>
+                      )}
+                      {/* Upload overlay on hover */}
+                      <label className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
+                        <Camera className="w-3 h-3 text-white" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          disabled={imageUploading}
+                        />
+                      </label>
+                      {imageUploading && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                          <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
                       )}
                     </div>
                     <span className="hidden md:block text-sm text-gray-700 font-medium max-w-24 truncate">
@@ -119,6 +192,19 @@ export default function Navbar() {
                             <Settings className="w-4 h-4 mr-3" />
                             Profile Settings
                           </Link>
+                          
+                          {/* Quick Profile Picture Upload */}
+                          <label className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                            <Camera className="w-4 h-4 mr-3" />
+                            {imageUploading ? "Uploading..." : "Change Profile Picture"}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              className="hidden"
+                              disabled={imageUploading}
+                            />
+                          </label>
                           
                           {/* Admin Dashboard Link */}
                           {session.user.role === "ADMIN" && (

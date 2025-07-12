@@ -12,6 +12,7 @@ export default function ProfilePage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -103,8 +104,8 @@ export default function ProfilePage() {
     setError("");
     setMessage("");
 
-    // Validate passwords if changing
-    if (formData.newPassword) {
+    // Validate passwords if changing and password section is shown
+    if (showChangePassword && formData.newPassword) {
       if (!formData.currentPassword) {
         setError("Current password is required to set a new password");
         setIsLoading(false);
@@ -122,6 +123,13 @@ export default function ProfilePage() {
       }
     }
 
+    // If password section is shown but no new password entered, validate required fields
+    if (showChangePassword && !formData.newPassword) {
+      setError("Please enter a new password or cancel password change");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const updateData = {
         name: formData.name,
@@ -129,7 +137,7 @@ export default function ProfilePage() {
         email: formData.email,
       };
 
-      if (formData.newPassword) {
+      if (showChangePassword && formData.newPassword) {
         updateData.currentPassword = formData.currentPassword;
         updateData.newPassword = formData.newPassword;
       }
@@ -160,7 +168,13 @@ export default function ProfilePage() {
         }
       });
 
-      setMessage("Profile updated successfully!");
+      // Set specific success message based on what was updated
+      if (showChangePassword && formData.newPassword) {
+        setMessage("Profile and password updated successfully!");
+        setShowChangePassword(false); // Hide password section after successful change
+      } else {
+        setMessage("Profile updated successfully!");
+      }
       
       // Clear password fields
       setFormData(prev => ({
@@ -313,66 +327,83 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Password Change */}
+            {/* Password Change Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Change Password</h3>
-              <p className="text-sm text-gray-600">Leave blank if you don't want to change your password</p>
-              
-              <div>
-                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                  Current Password
-                </label>
-                <input
-                  type="password"
-                  id="currentPassword"
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  placeholder="Enter current password"
-                />
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900">Security</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowChangePassword(!showChangePassword)}
+                  className="px-3 py-1.5 text-sm font-medium text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded border border-orange-200"
+                >
+                  {showChangePassword ? "Cancel" : "Change Password"}
+                </button>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                    New Password
-                  </label>
-                  <div className="relative">
+              
+              {showChangePassword && (
+                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border">
+                  <p className="text-sm text-gray-600">Enter your current password and choose a new one</p>
+                  
+                  <div>
+                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                      Current Password
+                    </label>
                     <input
-                      type={showPassword ? "text" : "password"}
-                      id="newPassword"
-                      name="newPassword"
-                      value={formData.newPassword}
+                      type="password"
+                      id="currentPassword"
+                      name="currentPassword"
+                      value={formData.currentPassword}
                       onChange={handleInputChange}
-                      className="w-full pr-10 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="Enter new password"
+                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="Enter current password"
+                      required={showChangePassword}
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                        New Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          id="newPassword"
+                          name="newPassword"
+                          value={formData.newPassword}
+                          onChange={handleInputChange}
+                          className="w-full pr-10 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="Enter new password"
+                          required={showChangePassword}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="Confirm new password"
+                        required={showChangePassword}
+                      />
+                    </div>
                   </div>
                 </div>
-
-                <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                    Confirm New Password
-                  </label>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Confirm new password"
-                  />
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Submit Button */}

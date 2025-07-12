@@ -26,38 +26,42 @@ export default function TagsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Tags</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className="h-24 bg-gray-100 rounded-lg animate-pulse"
-            ></div>
-          ))}
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-8 text-gray-900">Tags</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="h-24 bg-gray-100 rounded-lg animate-pulse"
+              ></div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Tags</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {tags.map((tag) => (
-          <div
-            key={tag.id}
-            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-          >
-            <h3 className="text-lg font-medium mb-2">{tag.name}</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              {tag.description || "No description available"}
-            </p>
-            <div className="text-sm text-gray-500">
-              {tag._count?.questions || 0} questions
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8 text-gray-900">Tags</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {tags.map((tag) => (
+            <div
+              key={tag.id}
+              className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+            >
+              <h3 className="text-lg font-medium mb-2 text-gray-900">{tag.name}</h3>
+              <p className="text-sm text-gray-600 mb-3">
+                {tag.description || "No description available"}
+              </p>
+              <div className="text-sm text-gray-500">
+                {tag._count?.questions || 0} questions
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
