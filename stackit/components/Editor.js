@@ -79,7 +79,28 @@ export default function Editor({ content, onChange, placeholder }) {
     editor.chain().focus().insertContent(emoji).run();
   };
 
-  const commonEmojis = ["😀", "😃", "😄", "😁", "😅", "😂", "🤣", "😊", "😇", "🙂", "🤔", "🤯", "😎", "🤗", "👍", "👎", "❤️", "🎉", "🔥", "💡"];
+  const commonEmojis = [
+    "😀",
+    "😃",
+    "😄",
+    "😁",
+    "😅",
+    "😂",
+    "🤣",
+    "😊",
+    "😇",
+    "🙂",
+    "🤔",
+    "🤯",
+    "😎",
+    "🤗",
+    "👍",
+    "👎",
+    "❤️",
+    "🎉",
+    "🔥",
+    "💡",
+  ];
 
   return (
     <div className="border border-gray-300 rounded-lg overflow-hidden">
@@ -95,9 +116,9 @@ export default function Editor({ content, onChange, placeholder }) {
             }`}
             title="Bold"
           >
-            <Bold className="w-4 h-4" />
+            <Bold className="w-4 h-4 text-gray-700" />
           </button>
-          
+
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -106,9 +127,9 @@ export default function Editor({ content, onChange, placeholder }) {
             }`}
             title="Italic"
           >
-            <Italic className="w-4 h-4" />
+            <Italic className="w-4 h-4 text-gray-700" />
           </button>
-          
+
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleStrike().run()}
@@ -117,7 +138,7 @@ export default function Editor({ content, onChange, placeholder }) {
             }`}
             title="Strikethrough"
           >
-            <Strikethrough className="w-4 h-4" />
+            <Strikethrough className="w-4 h-4 text-gray-700" />
           </button>
 
           <div className="w-px h-6 bg-gray-300 mx-1"></div>
@@ -131,9 +152,9 @@ export default function Editor({ content, onChange, placeholder }) {
             }`}
             title="Bullet List"
           >
-            <List className="w-4 h-4" />
+            <List className="w-4 h-4 text-gray-700" />
           </button>
-          
+
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
@@ -142,7 +163,7 @@ export default function Editor({ content, onChange, placeholder }) {
             }`}
             title="Numbered List"
           >
-            <ListOrdered className="w-4 h-4" />
+            <ListOrdered className="w-4 h-4 text-gray-700" />
           </button>
 
           <div className="w-px h-6 bg-gray-300 mx-1"></div>
@@ -156,9 +177,9 @@ export default function Editor({ content, onChange, placeholder }) {
             }`}
             title="Align Left"
           >
-            <AlignLeft className="w-4 h-4" />
+            <AlignLeft className="w-4 h-4 text-gray-700" />
           </button>
-          
+
           <button
             type="button"
             onClick={() => editor.chain().focus().setTextAlign("center").run()}
@@ -167,9 +188,9 @@ export default function Editor({ content, onChange, placeholder }) {
             }`}
             title="Align Center"
           >
-            <AlignCenter className="w-4 h-4" />
+            <AlignCenter className="w-4 h-4 text-gray-700" />
           </button>
-          
+
           <button
             type="button"
             onClick={() => editor.chain().focus().setTextAlign("right").run()}
@@ -178,7 +199,7 @@ export default function Editor({ content, onChange, placeholder }) {
             }`}
             title="Align Right"
           >
-            <AlignRight className="w-4 h-4" />
+            <AlignRight className="w-4 h-4 text-gray-700" />
           </button>
 
           <div className="w-px h-6 bg-gray-300 mx-1"></div>
@@ -190,16 +211,16 @@ export default function Editor({ content, onChange, placeholder }) {
             className="p-2 rounded hover:bg-gray-200"
             title="Add Link"
           >
-            <LinkIcon className="w-4 h-4" />
+            <LinkIcon className="w-4 h-4 text-gray-700" />
           </button>
-          
+
           <button
             type="button"
             onClick={addImage}
             className="p-2 rounded hover:bg-gray-200"
             title="Add Image"
           >
-            <ImageIcon className="w-4 h-4" />
+            <ImageIcon className="w-4 h-4 text-gray-700" />
           </button>
 
           {/* Emoji Picker */}
@@ -210,18 +231,18 @@ export default function Editor({ content, onChange, placeholder }) {
               onClick={() => setShowLinkDialog(!showLinkDialog)}
               title="Add Emoji"
             >
-              <Smile className="w-4 h-4" />
+              <Smile className="w-4 h-4 text-gray-700" />
             </button>
-            
+
             {showLinkDialog && (
               <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-10">
-                <div className="grid grid-cols-5 gap-1 max-w-[200px]">
+                <div className="flex flex-wrap gap-2 min-w-[300px] max-w-[400px]">
                   {commonEmojis.map((emoji) => (
                     <button
                       key={emoji}
                       type="button"
                       onClick={() => addEmoji(emoji)}
-                      className="p-1 hover:bg-gray-100 rounded text-lg"
+                      className="p-1.5 hover:bg-gray-100 rounded text-xl transition-transform hover:scale-125"
                     >
                       {emoji}
                     </button>
@@ -235,7 +256,7 @@ export default function Editor({ content, onChange, placeholder }) {
 
       {/* Editor Content */}
       <EditorContent editor={editor} />
-      
+
       {/* Placeholder when empty */}
       {editor.isEmpty && (
         <div className="absolute top-[60px] left-4 text-gray-400 pointer-events-none">

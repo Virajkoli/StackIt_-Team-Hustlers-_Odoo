@@ -43,7 +43,8 @@
 body {
   background: var(--background);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Liberation Sans", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Liberation Sans",
+    sans-serif;
   line-height: 1.5;
 }
 
@@ -57,7 +58,7 @@ body {
 
 .forum-card:hover {
   border-color: var(--border-hover);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .vote-container {
@@ -161,7 +162,12 @@ body {
   margin: 1rem 0;
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
   color: var(--text-primary);
   font-weight: 600;
   margin: 1.5rem 0 1rem 0;
@@ -214,4 +220,45 @@ body {
   outline: none;
   border-color: var(--link);
   box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
+}
+
+/* Ensure user input text is black and visible */
+input,
+textarea,
+[contenteditable="true"],
+.ProseMirror {
+  color: #000000 !important;
+  background-color: #ffffff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #666666;
+}
+
+.dark input,
+.dark textarea,
+.dark [contenteditable="true"],
+.dark .ProseMirror {
+  background-color: #ffffff;
+  color: #000000 !important;
+}
+
+/* Forum-style components */
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
 }
