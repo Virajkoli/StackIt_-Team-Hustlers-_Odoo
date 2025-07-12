@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static optimization
-  swcMinify: true,
-  
   // Optimize images
   images: {
     domains: ['res.cloudinary.com'],
@@ -30,10 +27,7 @@ const nextConfig = {
       },
     },
   },
-  // Reduce bundle size
-  compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
-  },
+
   // Improve performance
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
