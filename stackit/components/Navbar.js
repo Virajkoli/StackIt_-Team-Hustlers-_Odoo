@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Bell, User, LogOut, Menu, X, Search, Settings, ChevronDown } from "lucide-react";
+import { Bell, User, LogOut, Menu, X, Search, Settings, ChevronDown, Shield } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import NotificationBell from "./NotificationBell";
 import SearchBar from "./SearchBar";
@@ -119,6 +119,18 @@ export default function Navbar() {
                             <Settings className="w-4 h-4 mr-3" />
                             Profile Settings
                           </Link>
+                          
+                          {/* Admin Dashboard Link */}
+                          {session.user.role === "ADMIN" && (
+                            <Link
+                              href="/admin"
+                              className="flex items-center px-4 py-2 text-sm text-orange-700 hover:bg-orange-50"
+                              onClick={() => setIsProfileDropdownOpen(false)}
+                            >
+                              <Shield className="w-4 h-4 mr-3" />
+                              Admin Dashboard
+                            </Link>
+                          )}
                           
                           <button
                             onClick={() => {
