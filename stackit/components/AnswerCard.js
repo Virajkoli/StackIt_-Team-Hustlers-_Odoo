@@ -99,7 +99,7 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
         {/* Content */}
         <div className="flex-1">
           <div 
-            className="prose max-w-none mb-6"
+            className="prose prose-black max-w-none mb-6"
             dangerouslySetInnerHTML={{ __html: answer.content }}
           />
 

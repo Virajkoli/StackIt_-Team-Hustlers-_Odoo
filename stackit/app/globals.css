@@ -262,3 +262,14 @@ textarea::placeholder {
   line-clamp: 2;
   overflow: hidden;
 }
+
+
+.prose.prose-black {
+  color: #000000 !important;
+}
+
+.prose.prose-black p,
+.prose.prose-black div,
+.prose.prose-black span {
+  color: #000000 !important;
+}
