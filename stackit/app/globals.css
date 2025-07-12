@@ -1,26 +1,217 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Forum-inspired color palette */
+  --background: #f8f9fa;
+  --card-background: #ffffff;
+  --border: #e1e5e9;
+  --border-hover: #c8d1d8;
+  --text-primary: #0c0d0e;
+  --text-secondary: #6a737c;
+  --text-muted: #9199a1;
+  --link: #0073aa;
+  --link-hover: #0063aa;
+  --accent: #f48024;
+  --accent-hover: #da7c0c;
+  --success: #5eba7d;
+  --warning: #f2cc0c;
+  --error: #d1383d;
+  --vote-bg: #fafafb;
+  --vote-border: #d6d9dc;
+  --accepted: #5eba7d;
+  --accepted-bg: #d4f4dd;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a1a1b;
+    --card-background: #1a1a1b;
+    --border: #343536;
+    --border-hover: #474748;
+    --text-primary: #d7dadc;
+    --text-secondary: #818384;
+    --text-muted: #6a6b6c;
+    --link: #4fbcff;
+    --link-hover: #7cc7ff;
+    --accent: #ff6314;
+    --accent-hover: #ff7938;
+    --vote-bg: #161617;
+    --vote-border: #343536;
   }
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Liberation Sans", sans-serif;
+  line-height: 1.5;
+}
+
+/* Forum-style components */
+.forum-card {
+  background: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.1s ease-in-out;
+}
+
+.forum-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.vote-container {
+  background: var(--vote-bg);
+  border: 1px solid var(--vote-border);
+  border-radius: 4px;
+  min-width: 48px;
+}
+
+.vote-button {
+  color: var(--text-muted);
+  transition: color 0.1s ease-in-out;
+}
+
+.vote-button:hover {
+  color: var(--accent);
+}
+
+.vote-active {
+  color: var(--accent);
+}
+
+.stats-number {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.stats-label {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.tag {
+  background: #e1ecf4;
+  color: #39739d;
+  border: 1px solid #c7ddf2;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  font-weight: 500;
+}
+
+.tag:hover {
+  background: #cee0ed;
+  border-color: #a6c5e8;
+}
+
+.accepted-answer {
+  background: var(--accepted-bg);
+  border-color: var(--accepted);
+}
+
+.link-primary {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.link-primary:hover {
+  color: var(--link-hover);
+}
+
+.btn-primary {
+  background: var(--link);
+  color: white;
+  border: 1px solid var(--link);
+  border-radius: 3px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-primary:hover {
+  background: var(--link-hover);
+  border-color: var(--link-hover);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: white;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-accent:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* Prose styling for question/answer content */
+.prose {
+  color: var(--text-primary);
+  max-width: none;
+}
+
+.prose p {
+  margin: 1rem 0;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin: 1.5rem 0 1rem 0;
+}
+
+.prose a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.prose a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+.prose code {
+  background: #f6f6f6;
+  border: 1px solid #e4e6ea;
+  border-radius: 3px;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.875em;
+  color: #c7254e;
+}
+
+.prose pre {
+  background: #f6f6f6;
+  border: 1px solid #e4e6ea;
+  border-radius: 3px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--text-secondary);
+}
+
+/* Form styling */
+.form-input {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: border-color 0.1s ease-in-out;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--link);
+  box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
 }
