@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Bell, User, LogOut, Menu, X, Search } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import NotificationBell from "./NotificationBell";
+import SearchBar from "./SearchBar";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -20,9 +21,11 @@ export default function Navbar() {
               <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
                 <span className="text-white font-bold text-sm">S</span>
               </div>
-              <span className="text-xl font-bold text-gray-900 hidden sm:block">StackIt</span>
+              <span className="text-xl font-bold text-gray-900 hidden sm:block">
+                StackIt
+              </span>
             </Link>
-            
+
             {/* Main Navigation */}
             <div className="hidden md:flex space-x-1">
               <Link
@@ -48,14 +51,7 @@ export default function Navbar() {
 
           {/* Search Bar */}
           <div className="flex-1 max-w-md mx-6 hidden md:block">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search questions..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
-              />
-            </div>
+            <SearchBar />
           </div>
 
           {/* Right Side */}
@@ -65,7 +61,7 @@ export default function Navbar() {
             ) : session ? (
               <div className="flex items-center space-x-3">
                 <NotificationBell />
-                
+
                 {/* User Avatar & Menu */}
                 <div className="relative">
                   <div className="flex items-center space-x-2 cursor-pointer">
@@ -77,7 +73,7 @@ export default function Navbar() {
                     </span>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => signOut()}
                   className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"
@@ -117,7 +113,11 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="p-2 text-gray-600 hover:text-gray-900"
               >
-                {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {isMenuOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
@@ -129,16 +129,9 @@ export default function Navbar() {
             <div className="space-y-1">
               {/* Search on mobile */}
               <div className="px-2 py-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Search questions..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                  />
-                </div>
+                <SearchBar className="w-full" />
               </div>
-              
+
               <Link
                 href="/"
                 className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
@@ -163,7 +156,7 @@ export default function Navbar() {
               >
                 Ask Question
               </Link>
-              
+
               {!session && (
                 <div className="px-2 pt-2 space-y-2">
                   <Link
