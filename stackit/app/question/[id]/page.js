@@ -194,6 +194,7 @@ export default async function QuestionPage({ params }) {
                 answer={answer} 
                 questionAuthorId={question.authorId}
                 userId={session?.user?.id}
+                questionId={question.id}
               />
             ))}
           </div>

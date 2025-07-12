@@ -1,8 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import { formatRelativeTime } from "@/lib/utils";
 import { Check } from "lucide-react";
 import VoteButtons from "@/components/VoteButtons";
 
-export default function AnswerCard({ answer, questionAuthorId, userId }) {
+export default function AnswerCard({ answer, questionAuthorId, userId, questionId }) {
+  const [isAccepted, setIsAccepted] = useState(answer.isAccepted);
+  const [isLoading, setIsLoading] = useState(false);
+  
   const upvotes = answer.votes.filter(vote => vote.type === 'UP').length;
   const downvotes = answer.votes.filter(vote => vote.type === 'DOWN').length;
   const score = upvotes - downvotes;
@@ -12,8 +18,43 @@ export default function AnswerCard({ answer, questionAuthorId, userId }) {
     ? answer.votes.find(vote => vote.userId === userId)?.type || null
     : null;
 
+  // Check if current user is the question author
+  const isQuestionAuthor = userId === questionAuthorId;
+
+  const handleAcceptAnswer = async () => {
+    if (!questionId || isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/answers/accept', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          answerId: answer.id,
+          questionId: questionId
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsAccepted(data.isAccepted);
+        // Reload the page to update all answers' accept status
+        window.location.reload();
+      } else {
+        console.error('Error accepting answer:', data.error);
+      }
+    } catch (error) {
+      console.error('Error accepting answer:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className={`bg-white border rounded-lg p-6 ${answer.isAccepted ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}>
+    <div className={`bg-white border rounded-lg p-6 ${isAccepted ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}>
       <div className="flex gap-6">
         {/* Vote Section */}
         <div className="flex flex-col items-center space-y-2">
@@ -24,8 +65,25 @@ export default function AnswerCard({ answer, questionAuthorId, userId }) {
             size="default"
           />
           
-          {answer.isAccepted && (
-            <div className="p-2 rounded-full bg-green-100 text-green-600 mt-2">
+          {/* Accept Answer Button (only for question author) */}
+          {isQuestionAuthor && (
+            <button
+              onClick={handleAcceptAnswer}
+              disabled={isLoading}
+              className={`p-2 rounded-full transition-colors ${
+                isAccepted 
+                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                  : 'bg-gray-100 text-gray-400 hover:bg-green-100 hover:text-green-600'
+              } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              title={isAccepted ? 'Unaccept this answer' : 'Accept this answer'}
+            >
+              <Check className="w-5 h-5" />
+            </button>
+          )}
+          
+          {/* Accepted indicator (for everyone) */}
+          {isAccepted && !isQuestionAuthor && (
+            <div className="p-2 rounded-full bg-green-100 text-green-600">
               <Check className="w-5 h-5" />
             </div>
           )}
@@ -38,9 +96,9 @@ export default function AnswerCard({ answer, questionAuthorId, userId }) {
             dangerouslySetInnerHTML={{ __html: answer.content }}
           />
 
-          {/* Author Info */}
+          {/* Bottom row with accepted status and author info */}
           <div className="flex justify-between items-end">
-            {answer.isAccepted && (
+            {isAccepted && (
               <div className="flex items-center text-green-600 text-sm font-medium">
                 <Check className="w-4 h-4 mr-1" />
                 Accepted Answer
