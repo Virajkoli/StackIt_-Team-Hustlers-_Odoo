@@ -5,9 +5,14 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import QuestionCard from "@/components/QuestionCard";
 
-async function getQuestions(sortBy = "newest") {
+async function getQuestions(sortBy = "newest", searchQuery = "") {
   try {
-    const response = await fetch(`/api/questions?sort=${sortBy}`, {
+    let url = `/api/questions?sort=${sortBy}`;
+    if (searchQuery) {
+      url += `&search=${encodeURIComponent(searchQuery)}`;
+    }
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -30,19 +35,22 @@ export default function HomePage() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("newest");
+  const [searchQuery, setSearchQuery] = useState("");
   const searchParams = useSearchParams();
   const router = useRouter();
 
   useEffect(() => {
     const sortParam = searchParams.get("sort") || "newest";
+    const searchParam = searchParams.get("search") || "";
     setActiveFilter(sortParam);
-    fetchQuestions(sortParam);
+    setSearchQuery(searchParam);
+    fetchQuestions(sortParam, searchParam);
   }, [searchParams]);
 
-  const fetchQuestions = async (sortBy) => {
+  const fetchQuestions = async (sortBy, search = "") => {
     setLoading(true);
     try {
-      const fetchedQuestions = await getQuestions(sortBy);
+      const fetchedQuestions = await getQuestions(sortBy, search);
       setQuestions(fetchedQuestions);
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -56,6 +64,9 @@ export default function HomePage() {
     setActiveFilter(filter);
     const url = new URL(window.location);
     url.searchParams.set("sort", filter);
+    if (searchQuery) {
+      url.searchParams.set("search", searchQuery);
+    }
     router.push(url.pathname + url.search);
   };
 
@@ -68,6 +79,9 @@ export default function HomePage() {
   };
 
   const getFilterTitle = () => {
+    if (searchQuery) {
+      return `Search results for "${searchQuery}"`;
+    }
     switch (activeFilter) {
       case "active":
         return "Active Questions";
@@ -87,14 +101,25 @@ export default function HomePage() {
             <div className="bg-white rounded border border-gray-300 p-4 mb-4">
               <h3 className="font-semibold text-gray-900 mb-3">Navigation</h3>
               <nav className="space-y-1">
-                <Link href="/" className="flex items-center px-2 py-1 text-sm text-orange-600 bg-orange-50 rounded">
+                <Link
+                  href="/"
+                  className="flex items-center px-2 py-1 text-sm text-orange-600 bg-orange-50 rounded"
+                >
                   <span>Questions</span>
-                  <span className="ml-auto text-xs text-gray-500">{questions.length}</span>
+                  <span className="ml-auto text-xs text-gray-500">
+                    {questions.length}
+                  </span>
                 </Link>
-                <Link href="/tags" className="flex items-center px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded">
+                <Link
+                  href="/tags"
+                  className="flex items-center px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded"
+                >
                   Tags
                 </Link>
-                <Link href="/users" className="flex items-center px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded">
+                <Link
+                  href="/users"
+                  className="flex items-center px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded"
+                >
                   Users
                 </Link>
               </nav>
@@ -130,19 +155,23 @@ export default function HomePage() {
               </div>
               <div className="flex items-center space-x-3">
                 <div className="flex border border-gray-300 rounded overflow-hidden">
-                  <button 
+                  <button
                     onClick={() => handleFilterChange("newest")}
-                    className={`${getFilterButtonClass("newest")} border-r border-gray-300`}
+                    className={`${getFilterButtonClass(
+                      "newest"
+                    )} border-r border-gray-300`}
                   >
                     Newest
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleFilterChange("active")}
-                    className={`${getFilterButtonClass("active")} border-r border-gray-300`}
+                    className={`${getFilterButtonClass(
+                      "active"
+                    )} border-r border-gray-300`}
                   >
                     Active
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleFilterChange("unanswered")}
                     className={getFilterButtonClass("unanswered")}
                   >
@@ -168,32 +197,46 @@ export default function HomePage() {
               <div className="bg-white border border-gray-300 rounded p-8 text-center">
                 <div className="text-gray-400 text-4xl mb-4">🤔</div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                  {activeFilter === "unanswered" 
-                    ? "No unanswered questions" 
-                    : activeFilter === "active" 
-                    ? "No active questions" 
+                  {searchQuery
+                    ? `No results found for "${searchQuery}"`
+                    : activeFilter === "unanswered"
+                    ? "No unanswered questions"
+                    : activeFilter === "active"
+                    ? "No active questions"
                     : "No questions yet"}
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  {activeFilter === "unanswered" 
-                    ? "All questions have been answered!" 
-                    : activeFilter === "active" 
-                    ? "No recent activity on questions." 
+                  {searchQuery
+                    ? "Try adjusting your search terms or browse all questions."
+                    : activeFilter === "unanswered"
+                    ? "All questions have been answered!"
+                    : activeFilter === "active"
+                    ? "No recent activity on questions."
                     : "Be the first to ask a question and start the conversation!"}
                 </p>
-                <Link
-                  href="/ask"
-                  className="inline-block px-4 py-2 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded font-medium"
-                >
-                  Ask a Question
-                </Link>
+                <div className="space-x-2">
+                  {searchQuery && (
+                    <Link
+                      href="/"
+                      className="inline-block px-4 py-2 text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 rounded font-medium"
+                    >
+                      View All Questions
+                    </Link>
+                  )}
+                  <Link
+                    href="/ask"
+                    className="inline-block px-4 py-2 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded font-medium"
+                  >
+                    Ask a Question
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="space-y-0">
                 {questions.map((question, index) => (
-                  <QuestionCard 
-                    key={question.id} 
-                    question={question} 
+                  <QuestionCard
+                    key={question.id}
+                    question={question}
                     isLast={index === questions.length - 1}
                   />
                 ))}
