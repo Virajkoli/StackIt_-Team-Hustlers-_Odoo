@@ -13,45 +13,54 @@ export const authOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.emailOrUsername || !credentials?.password) {
+        try {
+          if (!credentials?.emailOrUsername || !credentials?.password) {
+            return null
+          }
+
+          // Check if input is email or username
+          const isEmail = credentials.emailOrUsername.includes('@')
+          
+          const user = await prisma.user.findFirst({
+            where: isEmail 
+              ? { email: credentials.emailOrUsername }
+              : { username: credentials.emailOrUsername }
+          })
+
+          if (!user) {
+            return null
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password || ""
+          )
+
+          if (!isPasswordValid) {
+            return null
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            username: user.username,
+            role: user.role,
+            image: user.image,
+          }
+        } catch (error) {
+          console.error("Auth error:", error)
           return null
-        }
-
-        // Check if input is email or username
-        const isEmail = credentials.emailOrUsername.includes('@')
-        
-        const user = await prisma.user.findFirst({
-          where: isEmail 
-            ? { email: credentials.emailOrUsername }
-            : { username: credentials.emailOrUsername }
-        })
-
-        if (!user) {
-          return null
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password || ""
-        )
-
-        if (!isPasswordValid) {
-          return null
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          username: user.username,
-          role: user.role,
-          image: user.image,
         }
       }
     })
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -76,4 +85,6 @@ export const authOptions = {
     signIn: "/login",
     signUp: "/register",
   },
+  debug: process.env.NODE_ENV === "development",
+  secret: process.env.NEXTAUTH_SECRET,
 }

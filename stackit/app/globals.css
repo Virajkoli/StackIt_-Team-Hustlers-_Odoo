@@ -158,6 +158,17 @@ body {
   max-width: none;
 }
 
+/* Force black text for question content */
+.prose.prose-black {
+  color: #000000 !important;
+}
+
+.prose.prose-black p,
+.prose.prose-black div,
+.prose.prose-black span {
+  color: #000000 !important;
+}
+
 .prose p {
   margin: 1rem 0;
 }
