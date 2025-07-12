@@ -1,23 +1,17 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/stackit/node_modules
-/.pnp
+stackit/node_modules/
+.pnp
 .pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
 
 # testing
 /coverage
 
 # next.js
-/stackit/.next/
+stackit/.next/
 /out/
 .next
-
 
 # production
 /build
@@ -32,8 +26,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# local env files (can opt-in for committing if needed)
+stackit/.env*
 
 # vercel
 .vercel
@@ -41,3 +35,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database
+stackit/prisma/dev.db
+stackit/prisma/dev.db-journal
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db

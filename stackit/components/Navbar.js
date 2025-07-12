@@ -153,14 +153,6 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Ask Question Button */}
-            <Link
-              href="/ask"
-              className="px-3 py-1.5 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded font-medium hidden md:block"
-            >
-              Ask Question
-            </Link>
-
             {/* Mobile menu button */}
             <div className="md:hidden">
               <button
