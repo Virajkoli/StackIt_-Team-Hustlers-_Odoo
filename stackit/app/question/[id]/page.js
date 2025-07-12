@@ -1,14 +1,15 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatRelativeTime } from "@/lib/utils";
-import { ArrowUp, ArrowDown, Check, MessageCircle } from "lucide-react";
+import { Check, MessageCircle } from "lucide-react";
 import AnswerCard from "@/components/AnswerCard";
+import VoteButtons from "@/components/VoteButtons";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import AnswerForm from "@/components/AnswerForm";
 
-async function getQuestion(id) {
+async function getQuestion(id, userId = null) {
   try {
     const question = await prisma.question.findUnique({
       where: { id },
@@ -73,8 +74,8 @@ async function getQuestion(id) {
 
 export default async function QuestionPage({ params }) {
   const { id } = await params;
-  const question = await getQuestion(id);
   const session = await getServerSession(authOptions);
+  const question = await getQuestion(id, session?.user?.id);
 
   if (!question) {
     notFound();
@@ -84,6 +85,11 @@ export default async function QuestionPage({ params }) {
   const downvotes = question.votes.filter(vote => vote.type === 'DOWN').length;
   const score = upvotes - downvotes;
   const hasAcceptedAnswer = question.answers.some(answer => answer.isAccepted);
+  
+  // Get user's vote on this question
+  const userVote = session?.user?.id 
+    ? question.votes.find(vote => vote.userId === session.user.id)?.type || null
+    : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -113,17 +119,12 @@ export default async function QuestionPage({ params }) {
       <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
         <div className="flex gap-6">
           {/* Vote Section */}
-          <div className="flex flex-col items-center space-y-2">
-            <button className="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-800">
-              <ArrowUp className="w-6 h-6" />
-            </button>
-            <span className={`text-lg font-semibold ${score > 0 ? 'text-green-600' : score < 0 ? 'text-red-600' : 'text-gray-600'}`}>
-              {score}
-            </span>
-            <button className="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-800">
-              <ArrowDown className="w-6 h-6" />
-            </button>
-          </div>
+          <VoteButtons 
+            initialScore={score}
+            initialUserVote={userVote}
+            questionId={question.id}
+            size="large"
+          />
 
           {/* Content */}
           <div className="flex-1">
@@ -190,6 +191,7 @@ export default async function QuestionPage({ params }) {
                 key={answer.id} 
                 answer={answer} 
                 questionAuthorId={question.authorId}
+                userId={session?.user?.id}
               />
             ))}
           </div>

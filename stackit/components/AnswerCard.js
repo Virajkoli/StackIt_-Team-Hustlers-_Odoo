@@ -1,28 +1,31 @@
 import { formatRelativeTime } from "@/lib/utils";
-import { ArrowUp, ArrowDown, Check } from "lucide-react";
+import { Check } from "lucide-react";
+import VoteButtons from "@/components/VoteButtons";
 
-export default function AnswerCard({ answer, questionAuthorId }) {
+export default function AnswerCard({ answer, questionAuthorId, userId }) {
   const upvotes = answer.votes.filter(vote => vote.type === 'UP').length;
   const downvotes = answer.votes.filter(vote => vote.type === 'DOWN').length;
   const score = upvotes - downvotes;
+  
+  // Get user's vote on this answer
+  const userVote = userId 
+    ? answer.votes.find(vote => vote.userId === userId)?.type || null
+    : null;
 
   return (
     <div className={`bg-white border rounded-lg p-6 ${answer.isAccepted ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}>
       <div className="flex gap-6">
         {/* Vote Section */}
         <div className="flex flex-col items-center space-y-2">
-          <button className="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-800">
-            <ArrowUp className="w-5 h-5" />
-          </button>
-          <span className={`text-lg font-semibold ${score > 0 ? 'text-green-600' : score < 0 ? 'text-red-600' : 'text-gray-600'}`}>
-            {score}
-          </span>
-          <button className="p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-800">
-            <ArrowDown className="w-5 h-5" />
-          </button>
+          <VoteButtons 
+            initialScore={score}
+            initialUserVote={userVote}
+            answerId={answer.id}
+            size="default"
+          />
           
           {answer.isAccepted && (
-            <div className="p-2 rounded-full bg-green-100 text-green-600">
+            <div className="p-2 rounded-full bg-green-100 text-green-600 mt-2">
               <Check className="w-5 h-5" />
             </div>
           )}
