@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static optimization
-  swcMinify: true,
-  
   // Optimize images
   images: {
     domains: ['res.cloudinary.com'],
@@ -21,11 +18,17 @@ const nextConfig = {
     // Improve build performance
     webpackBuildWorker: true,
   },
+  // Move turbo to top level as it's now stable
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
+      },
+    },
+  },
 
-  // Compression
-  compress: true,
-
-  // Optimize for development and production
+  // Improve performance
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
       // Reduce compilation in development

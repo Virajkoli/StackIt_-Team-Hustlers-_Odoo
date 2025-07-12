@@ -7,15 +7,15 @@ import { writeFile } from 'fs/promises';
 import { join } from 'path';
 
 // Check if Cloudinary is configured
-const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
-                              process.env.CLOUDINARY_API_KEY && 
-                              process.env.CLOUDINARY_API_SECRET;
+const isCloudinaryConfigured = process.env.CLOUD_NAME && 
+                              process.env.API_KEY && 
+                              process.env.API_SECRET;
 
 if (isCloudinaryConfigured) {
   cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
   });
 }
 
