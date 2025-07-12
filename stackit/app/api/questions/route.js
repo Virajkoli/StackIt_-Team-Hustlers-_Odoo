@@ -10,10 +10,12 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get("limit")) || 20;
     const tag = searchParams.get("tag");
     const search = searchParams.get("search");
+    const sort = searchParams.get("sort") || "newest";
 
     const skip = (page - 1) * limit;
 
     let where = {};
+    let orderBy = {};
     
     if (tag) {
       where.tags = {
@@ -43,28 +45,121 @@ export async function GET(request) {
       ];
     }
 
+    // Configure sorting and filtering based on the sort parameter
+    switch (sort) {
+      case "newest":
+        orderBy = { createdAt: "desc" };
+        break;
+        
+      case "active":
+        // Questions with recent activity (answers, votes, or updates)
+        orderBy = [
+          { updatedAt: "desc" },
+          { createdAt: "desc" }
+        ];
+        break;
+        
+      case "unanswered":
+        // Questions with no answers
+        where = {
+          ...where,
+          answers: {
+            none: {}
+          }
+        };
+        orderBy = { createdAt: "desc" };
+        break;
+        
+      default:
+        orderBy = { createdAt: "desc" };
+    }
+
+    const includeOptions = {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          email: true,
+        },
+      },
+      tags: true,
+      answers: {
+        select: {
+          id: true,
+          isAccepted: true,
+          createdAt: true,
+        },
+      },
+      votes: {
+        select: {
+          type: true,
+        },
+      },
+      _count: {
+        select: {
+          answers: true,
+          votes: true,
+        },
+      },
+    };
+
+    // For active questions, we need a more complex query to include questions with recent answers
+    if (sort === "active") {
+      const questions = await prisma.question.findMany({
+        where,
+        include: includeOptions,
+        orderBy: [
+          { updatedAt: "desc" },
+          { createdAt: "desc" }
+        ],
+        skip,
+        take: limit,
+      });
+
+      // Calculate activity score for each question
+      const questionsWithActivity = questions.map(question => {
+        const latestAnswerDate = question.answers.length > 0 
+          ? new Date(Math.max(...question.answers.map(a => new Date(a.createdAt))))
+          : null;
+        
+        const questionDate = new Date(question.createdAt);
+        const updateDate = new Date(question.updatedAt);
+        
+        // Use the most recent date among question creation, update, and latest answer
+        const activityDate = latestAnswerDate && latestAnswerDate > updateDate 
+          ? latestAnswerDate 
+          : updateDate > questionDate 
+          ? updateDate 
+          : questionDate;
+
+        return {
+          ...question,
+          lastActivity: activityDate
+        };
+      });
+
+      // Sort by activity date
+      questionsWithActivity.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+
+      const total = await prisma.question.count({ where });
+
+      return NextResponse.json({
+        questions: questionsWithActivity,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      });
+    }
+
+    // Standard query for newest and unanswered
     const questions = await prisma.question.findMany({
       where,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            email: true,
-          },
-        },
-        tags: true,
-        _count: {
-          select: {
-            answers: true,
-            votes: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+      include: includeOptions,
+      orderBy,
       skip,
       take: limit,
     });
