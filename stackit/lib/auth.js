@@ -65,9 +65,24 @@ export const authOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.sub
-        session.user.role = token.role
         session.user.username = token.username
         session.user.image = token.image
+        
+        // Always fetch the latest role from database to ensure role changes are reflected
+        if (token.sub) {
+          try {
+            const user = await prisma.user.findUnique({
+              where: { id: token.sub },
+              select: { role: true }
+            });
+            session.user.role = user?.role || token.role;
+          } catch (error) {
+            console.error('Error fetching user role:', error);
+            session.user.role = token.role;
+          }
+        } else {
+          session.user.role = token.role;
+        }
       }
       return session
     }

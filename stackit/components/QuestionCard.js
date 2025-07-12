@@ -1,5 +1,6 @@
 import Link from "next/link";
 import FastLink from "@/components/FastLink";
+import AdminActions from "@/components/AdminActions";
 import { formatRelativeTime } from "@/lib/utils";
 import { ArrowUp, ArrowDown, MessageCircle, Check } from "lucide-react";
 
@@ -82,6 +83,12 @@ export default function QuestionCard({ question, isLast }) {
               </Link>
             </div>
           </div>
+          
+          {/* Admin Actions */}
+          <AdminActions 
+            contentType="question" 
+            contentId={question.id}
+          />
         </div>
       </div>
     </div>

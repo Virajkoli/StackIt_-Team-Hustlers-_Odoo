@@ -4,6 +4,7 @@ import { useState } from "react";
 import { formatRelativeTime } from "@/lib/utils";
 import { Check } from "lucide-react";
 import VoteButtons from "@/components/VoteButtons";
+import AdminActions from "@/components/AdminActions";
 import { ButtonLoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function AnswerCard({ answer, questionAuthorId, userId, questionId }) {
@@ -125,6 +126,12 @@ export default function AnswerCard({ answer, questionAuthorId, userId, questionI
               </div>
             </div>
           </div>
+          
+          {/* Admin Actions */}
+          <AdminActions 
+            contentType="answer" 
+            contentId={answer.id}
+          />
         </div>
       </div>
     </div>
