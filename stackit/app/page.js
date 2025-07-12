@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatRelativeTime } from "@/lib/utils";
-import QuestionCard from "@/components/QuestionCard";
+import QuestionsListClient from "@/components/QuestionsListClient";
 
 async function getQuestions() {
   try {
@@ -87,87 +87,7 @@ export default async function Home() {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 p-4">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  All Questions
-                </h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  {questions.length} questions
-                </p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="flex border border-gray-300 rounded overflow-hidden">
-                  <button className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 border-r border-gray-300">
-                    Newest
-                  </button>
-                  <button className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
-                    Active
-                  </button>
-                  <button className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50">
-                    Unanswered
-                  </button>
-                </div>
-                <Link
-                  href="/ask"
-                  className="px-4 py-2 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded font-medium"
-                >
-                  Ask Question
-                </Link>
-              </div>
-            </div>
-
-            {/* Questions List */}
-            {questions.length === 0 ? (
-              <div className="bg-white border border-gray-300 rounded p-8 text-center">
-                <div className="text-gray-400 text-4xl mb-4">🤔</div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                  No questions yet
-                </h3>
-                <p className="text-gray-500 mb-6">
-                  Be the first to ask a question and start the conversation!
-                </p>
-                <Link
-                  href="/ask"
-                  className="inline-block px-4 py-2 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded font-medium"
-                >
-                  Ask the First Question
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-0">
-                {questions.map((question, index) => (
-                  <QuestionCard 
-                    key={question.id} 
-                    question={question} 
-                    isLast={index === questions.length - 1}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Pagination placeholder */}
-            {questions.length > 0 && (
-              <div className="mt-8 flex justify-center">
-                <div className="flex space-x-1">
-                  <button className="px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50">
-                    Previous
-                  </button>
-                  <button className="px-3 py-2 text-sm border border-gray-300 rounded bg-orange-500 text-white">
-                    1
-                  </button>
-                  <button className="px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50">
-                    2
-                  </button>
-                  <button className="px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50">
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          <QuestionsListClient initialQuestions={questions} />
         </div>
       </div>
     </div>
