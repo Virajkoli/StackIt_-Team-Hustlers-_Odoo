@@ -5,18 +5,16 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react"],
     // Improve build performance
     webpackBuildWorker: true,
-    // Enable faster compilation
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
+  },
+  // Move turbo to top level as it's now stable
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
       },
     },
   },
-  // Optimize for development
-  swcMinify: true,
   // Reduce bundle size
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
