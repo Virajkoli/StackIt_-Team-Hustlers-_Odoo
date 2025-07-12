@@ -215,3 +215,21 @@ body {
   border-color: var(--link);
   box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
 }
+
+/* Ensure user input text is black and visible */
+input, textarea, [contenteditable="true"], .ProseMirror {
+  color: #000000 !important;
+  background-color: #ffffff;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #666666;
+}
+
+.dark input, 
+.dark textarea, 
+.dark [contenteditable="true"],
+.dark .ProseMirror {
+  background-color: #ffffff;
+  color: #000000 !important;
+}
