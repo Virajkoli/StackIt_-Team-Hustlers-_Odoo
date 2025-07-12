@@ -8,6 +8,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import AnswerForm from "@/components/AnswerForm";
+import ViewTracker from "@/components/ViewTracker";
 
 async function getQuestion(id, userId = null) {
   try {
@@ -93,6 +94,7 @@ export default async function QuestionPage({ params }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <ViewTracker questionId={question.id} />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Question Header */}
       <div className="mb-8">

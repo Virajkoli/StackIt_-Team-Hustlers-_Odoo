@@ -29,7 +29,7 @@ export default function QuestionCard({ question, isLast }) {
           </div>
           
           <div className="text-center">
-            <div className="font-semibold text-gray-600">0</div>
+            <div className="font-semibold text-gray-600">{question.views || 0}</div>
             <div className="text-xs text-gray-500">views</div>
           </div>
         </div>
