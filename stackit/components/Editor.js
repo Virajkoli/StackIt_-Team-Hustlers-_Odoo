@@ -27,7 +27,22 @@ export default function Editor({ content, onChange, placeholder }) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        bulletList: {
+          HTMLAttributes: {
+            class: "list-disc ml-4",
+          },
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: "list-decimal ml-4",
+          },
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
       Image.configure({
         HTMLAttributes: {
           class: "max-w-full h-auto rounded-lg",
